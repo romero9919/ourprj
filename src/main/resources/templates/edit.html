@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.9.1/summernote-bs4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.9.1/lang/summernote-ko-KR.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#content").summernote({
+                height: 300,
+                lang: 'ko-KR'
+            });
+        });
+    </script>
+    <title>스프링부트 게시판</title>
+</head>
+
+<body>
+    <!--헤더-->
+    <div th:replace="inc/header :: header"></div>
+    <!--본문-->
+    <div class="container py-5">
+        <div th:if="${error}" th:text="${error}" style="color:red"></div>
+        <form name="editform" action="edit" method="post" onsubmit="return validateForm();">
+            <div class="row">
+                <label class="col-1 mb-3">작성자</label>
+                <input type="text" name="writer" class="col-3 form-control mb-3" placeholder="작성자"
+                    th:value="${board.writer}" />
+                <label class="col-1 offset-1 mb-3">비밀번호</label>
+                <input type="password" name="pass" class="col-3 form-control mb-3" placeholder="비밀번호" />
+                <input type="hidden" name="userid" value="guest">
+                <div class="col-3 mb-3"></div>
+                <label class="col-1 mb-3">제목</label>
+                <input type="text" name="title" class="form-control col-11 mb-3" placeholder="제목"
+                    th:value="${board.title}" />
+
+                <label class="col-1 mb-3">내용</label>
+                <div class="col-11 mb-3">
+                    <textarea name="content" id="content" th:text="${board.content}"></textarea>
+                </div>
+                <input type="hidden" name="id" th:value="${board.id}" />
+            </div>
+            <div class="text-center my-4">
+                <button class="btn btn-danger" type="button" onclick="history.go(-1);">취소</button>
+                <button class="btn btn-dark" type="submit">전송</button>
+            </div>
+        </form>
+        <script>
+            function validateForm() {
+                //제목, 내용
+                const title = document.editform.title.value.trim();
+                const content = document.editform.content.value.trim();
+                const writer = document.editform.writer.value.trim();
+                const pass = document.editform.pass.value.trim();
+
+                if (writer === "") {
+                    alert("이름을 입력 하세요.");
+                    document.editform.writer.focus();
+                    return false;
+                }
+                if (pass === "") {
+                    alert("비밀번호를 입력 하세요.");
+                    document.editform.pass.focus();
+                    return false;
+                }
+                if (title === "") {
+                    alert("제목을 입력하세요.");
+                    document.editform.title.focus();
+                    return false;
+                }
+                if (content === "") {
+                    alert("내용을 입력하세요.");
+                    document.editform.content.focus();
+                    return false;
+                }
+
+                return true;
+            }
+        </script>
+    </div>
+    <!--푸터-->
+    <div th:replace="inc/footer :: footer"></div>
+</body>
+
+</html>

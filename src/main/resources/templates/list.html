@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>스프링부트 게시판</title>
+</head>
+
+<body>
+    <!--헤더-->
+    <div th:replace="~{inc/header :: header}"></div>
+    <!--본문-->
+    <div class="container py-4">
+        <table class="table table-hover">
+            <colgroup>
+                <col width="5%">
+                <col>
+                <col width="10%">
+                <col width="10%">
+                <col width="15%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>조회수</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="list : ${lists}">
+                    <td th:text="${list.id}"></td>
+                    <td><a th:href="@{/view(id=${list.id})}" th:text="${list.title}"></a></td>
+                    <td th:text="${list.writer}"></td>
+                    <td th:text="${list.hit}"></td>
+                    <td th:data-wdate="${list.wdate}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="searchform">
+            <form action="/" class="search-form" method="get">
+                <select name="searchKey">
+                    <option value="writer" th:selected="${searchKey =='writer'}">작성자</option>
+                    <option value="title" th:selected="${searchKey =='title'}">제목</option>
+                    <option value="content" th:selected="${searchKey =='content'}">내용</option>
+                </select>
+                <input type="search" name="searchVal" placeholder="검색" th:value="${searchVal}">
+                <button type="submit">검색</button>
+            </form>
+        </div>
+        <div class="text-right mt-3 mb-5">
+            <a href="write" class="btn btn-dark">글쓰기</a>
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!lists.hasPrevious()} ? 'disabled'">
+                    <a th:href="@{/(page=${lists.number-1}, size=${lists.size})}" class="page-link">이전</a>
+                </li>
+                <th:block th:each="i : ${#numbers.sequence(0, lists.totalPages - 1)}">
+                    <li class="page-item" th:classappend="${i}==${lists.number} ? 'active'">
+                        <a th:href="@{/(page=${i}, size=${lists.size})}" th:text="${i+1}" class="page-link"></a>
+                    </li>
+                </th:block>
+                <li class="page-item" th:classappend="${!lists.hasNext()}?'disabled'">
+                    <a th:href="@{/(page=${lists.number + 1}, size=${lists.size})}" class="page-link">다음</a>
+                </li>
+            </ul>
+        </nav>
+    </div><!--/.container-->
+
+
+    <!--푸터-->
+    <div th:replace="~{inc/footer :: footer}"></div>
+    <script>
+        document.querySelectorAll('td[data-wdate]').forEach(td => {
+            const wdate = new Date(td.dataset.wdate);
+            const now = new Date();
+            const diff = (now - wdate) / (1000 * 60 * 60); //시간 차이계산
+            let rdate;
+            if (diff < 24) {
+                rdate = wdate.getHours().toString().padStart(2, '0') + ":" +
+                    wdate.getMinutes().toString().padStart(2, '0');
+            } else {
+                rdate = wdate.getFullYear() + "-" + (wdate.getMonth() + 1).toString().padStart(2, '0');
+                rdate += "-" + wdate.getDate().toString().padStart(2, "0");
+            }
+            td.textContent = rdate;
+        });
+
+    </script>
+
+</body>
+
+</html>
